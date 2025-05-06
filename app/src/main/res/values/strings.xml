@@ -1,3 +1,23 @@
 <resources>
-    <string name="app_name">miniproject2</string>
+    <string name="app_name">NabungYuk</string>
+    <string name="list_kosong">Belum ada tabungan</string>
+    <string name="tambah_tabungan">Tambah Tabungan</string>
+    <string name="nama_tabungan">Nama Tabungan</string>
+    <string name="target">Target (Rp)</string>
+    <string name="tipe">Tipe</string>
+    <string name="jumlah_menabung">Jumlah Menabung (Rp)</string>
+    <string name="kembali">Kembali</string>
+    <string name="simpan">Simpan</string>
+    <string name="edit_tabungan">Ubah Tabungan</string>
+    <string name="invalid">Semua data tidak boleh kosong.</string>
+    <string name="lainnya">Opsi lainnya</string>
+    <string name="hapus">Hapus Tabungan</string>
+    <string name="pesan_hapus">Hapus tabungan ini?</string>
+    <string name="tombol_hapus">Hapus</string>
+    <string name="tombol_batal">Batal</string>
+    <string name="list">Tampilan list</string>
+    <string name="grid">Tampilan grid</string>
+    <string name="harian">Harian</string>
+    <string name="mingguan">Mingguan</string>
+    <string name="bulanan">Bulanan</string>
 </resources>
