@@ -11,6 +11,7 @@ import com.aryastefhani0140.miniproject2.ui.screen.DetailScreen
 import com.aryastefhani0140.miniproject2.ui.screen.KEY_ID_TABUNGAN
 import com.aryastefhani0140.miniproject2.ui.screen.MainScreen
 import com.aryastefhani0140.miniproject2.ui.screen.RecycleBinScreen
+import com.aryastefhani0140.miniproject2.ui.screen.ThemeScreen
 
 @Composable
 fun SetupNavGraph(navController: NavHostController = rememberNavController()) {
@@ -35,6 +36,9 @@ fun SetupNavGraph(navController: NavHostController = rememberNavController()) {
         }
         composable(route = Screen.RecycleBin.route) {
             RecycleBinScreen(navController)
+        }
+        composable(route = Screen.ThemeSettings.route) {
+            ThemeScreen(navController)
         }
     }
 }

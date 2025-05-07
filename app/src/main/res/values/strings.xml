@@ -20,7 +20,7 @@
     <string name="harian">Harian</string>
     <string name="mingguan">Mingguan</string>
     <string name="bulanan">Bulanan</string>
-    <!-- Strings baru untuk fitur Recycle Bin -->
+
     <string name="recycle_bin">Recycle Bin</string>
     <string name="empty_recycle_bin">Kosongkan Recycle Bin</string>
     <string name="restore">Pulihkan</string>
@@ -30,4 +30,10 @@
     <string name="confirm_permanent_delete">Apakah Anda yakin ingin menghapus tabungan ini secara permanen?</string>
     <string name="item_deleted">Tabungan dihapus</string>
     <string name="undo">Undo</string>
+
+    <string name="theme_settings">Pengaturan Tema</string>
+    <string name="select_theme">Pilih Tema</string>
+    <string name="theme_system">Sistem</string>
+    <string name="theme_light">Terang</string>
+    <string name="theme_dark">Gelap</string>
 </resources>
