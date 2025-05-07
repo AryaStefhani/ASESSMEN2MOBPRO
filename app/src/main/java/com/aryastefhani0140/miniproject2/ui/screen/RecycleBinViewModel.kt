@@ -10,22 +10,28 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class MainViewModel(private val dao: TabunganDao) : ViewModel() {
-    val data: StateFlow<List<Tabungan>> = dao.getTabungan().stateIn(
+class RecycleBinViewModel(private val dao: TabunganDao) : ViewModel() {
+    val deletedData: StateFlow<List<Tabungan>> = dao.getDeletedTabungan().stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(),
         initialValue = emptyList()
     )
 
-    fun deleteTabungan(id: Long) {
-        viewModelScope.launch(Dispatchers.IO) {
-            dao.softDeleteById(id)
-        }
-    }
-
     fun restoreTabungan(id: Long) {
         viewModelScope.launch(Dispatchers.IO) {
             dao.restoreById(id)
+        }
+    }
+
+    fun permanentDeleteTabungan(id: Long) {
+        viewModelScope.launch(Dispatchers.IO) {
+            dao.deleteById(id)
+        }
+    }
+
+    fun emptyRecycleBin() {
+        viewModelScope.launch(Dispatchers.IO) {
+            dao.emptyRecycleBin()
         }
     }
 }

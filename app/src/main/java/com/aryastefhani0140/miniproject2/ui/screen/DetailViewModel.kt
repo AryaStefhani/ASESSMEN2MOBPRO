@@ -19,7 +19,8 @@ class DetailViewModel(private val dao: TabunganDao) : ViewModel() {
             nama = nama,
             target = target,
             tipe = tipe,
-            jumlah = jumlah
+            jumlah = jumlah,
+            isDeleted = false
         )
         viewModelScope.launch(Dispatchers.IO) {
             dao.insert(tabungan)
@@ -31,22 +32,26 @@ class DetailViewModel(private val dao: TabunganDao) : ViewModel() {
     }
 
     fun update(id: Long, nama: String, target: Double, tipe: String, jumlah: Double) {
-        val tabungan = Tabungan(
-            id = id,
-            tanggal = formatter.format(Date()),
-            nama = nama,
-            target = target,
-            tipe = tipe,
-            jumlah = jumlah
-        )
         viewModelScope.launch(Dispatchers.IO) {
-            dao.update(tabungan)
+            val current = dao.getTabunganById(id)
+            if (current != null) {
+                val tabungan = Tabungan(
+                    id = id,
+                    tanggal = formatter.format(Date()),
+                    nama = nama,
+                    target = target,
+                    tipe = tipe,
+                    jumlah = jumlah,
+                    isDeleted = current.isDeleted
+                )
+                dao.update(tabungan)
+            }
         }
     }
 
     fun delete(id: Long) {
         viewModelScope.launch(Dispatchers.IO) {
-            dao.deleteById(id)
+            dao.softDeleteById(id)
         }
     }
 }

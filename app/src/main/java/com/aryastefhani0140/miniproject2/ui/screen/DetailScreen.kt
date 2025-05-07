@@ -45,6 +45,10 @@ import androidx.navigation.compose.rememberNavController
 import com.aryastefhani0140.miniproject2.R
 import com.aryastefhani0140.miniproject2.ui.theme.Miniproject2Theme
 import com.aryastefhani0140.miniproject2.util.ViewModelFactory
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 const val KEY_ID_TABUNGAN = "idTabungan"
 
@@ -158,7 +162,10 @@ fun DetailScreen(navController: NavController, id: Long? = null) {
             showDialog = false
             viewModel.delete(id)
             navController.popBackStack()
-        }
+            CoroutineScope(Dispatchers.Main).launch {
+                delay(3000)
+            }
+            }
     }
 }
 

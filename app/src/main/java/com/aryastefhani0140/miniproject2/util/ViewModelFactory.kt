@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.aryastefhani0140.miniproject2.database.TabunganDb
 import com.aryastefhani0140.miniproject2.ui.screen.DetailViewModel
 import com.aryastefhani0140.miniproject2.ui.screen.MainViewModel
+import com.aryastefhani0140.miniproject2.ui.screen.RecycleBinViewModel
 
 class ViewModelFactory(
     private val context: Context
@@ -13,11 +14,17 @@ class ViewModelFactory(
     @Suppress("unchecked_cast")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         val dao = TabunganDb.getInstance(context).dao
-        if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
-            return MainViewModel(dao) as T
-        } else if (modelClass.isAssignableFrom(DetailViewModel::class.java)) {
-            return DetailViewModel(dao) as T
+        return when {
+            modelClass.isAssignableFrom(MainViewModel::class.java) -> {
+                MainViewModel(dao) as T
+            }
+            modelClass.isAssignableFrom(DetailViewModel::class.java) -> {
+                DetailViewModel(dao) as T
+            }
+            modelClass.isAssignableFrom(RecycleBinViewModel::class.java) -> {
+                RecycleBinViewModel(dao) as T
+            }
+            else -> throw IllegalArgumentException("Unknown ViewModel class")
         }
-        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
