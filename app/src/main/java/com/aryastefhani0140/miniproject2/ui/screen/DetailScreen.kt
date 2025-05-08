@@ -30,7 +30,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -55,7 +54,7 @@ fun DetailScreen(navController: NavController, id: Long? = null, onDeleteWithUnd
     val context = LocalContext.current
     val factory = ViewModelFactory(context)
     val viewModel: DetailViewModel = viewModel(factory = factory)
-    val scope = rememberCoroutineScope()
+
 
     var nama by remember { mutableStateOf("") }
     var target by remember { mutableStateOf("") }

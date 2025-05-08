@@ -30,10 +30,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -42,7 +39,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -65,6 +61,8 @@ import com.aryastefhani0140.miniproject2.util.ViewModelFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.text.NumberFormat
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -154,7 +152,6 @@ fun MainScreen(navController: NavHostController, viewModel: MainViewModel) {
             showList = showList,
             modifier = Modifier.padding(innerPadding),
             navController = navController,
-            snackbarHostState = snackbarHostState,
             viewModel = viewModel
         )
     }
@@ -165,11 +162,9 @@ fun ScreenContent(
     showList: Boolean,
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    snackbarHostState: SnackbarHostState,
     viewModel: MainViewModel
 ) {
     val data by viewModel.data.collectAsState()
-    val scope = rememberCoroutineScope()
 
     if (data.isEmpty()) {
         Column(
@@ -190,20 +185,7 @@ fun ScreenContent(
                 items(data) { tabungan ->
                     ListItem(
                         tabungan = tabungan,
-                        onClick = { navController.navigate(Screen.FormUbah.withId(tabungan.id)) },
-                        onDelete = {
-                            viewModel.deleteTabungan(tabungan.id)
-                            scope.launch {
-                                val result = snackbarHostState.showSnackbar(
-                                    message = "Tabungan '${tabungan.nama}' dihapus",
-                                    actionLabel = "Undo",
-                                    duration = SnackbarDuration.Short
-                                )
-                                if (result == SnackbarResult.ActionPerformed) {
-                                    viewModel.restoreTabungan(tabungan.id)
-                                }
-                            }
-                        }
+                        onClick = { navController.navigate(Screen.FormUbah.withId(tabungan.id)) }
                     )
                     HorizontalDivider()
                 }
@@ -219,20 +201,7 @@ fun ScreenContent(
                 items(data) { tabungan ->
                     GridItem(
                         tabungan = tabungan,
-                        onClick = { navController.navigate(Screen.FormUbah.withId(tabungan.id)) },
-                        onDelete = {
-                            viewModel.deleteTabungan(tabungan.id)
-                            scope.launch {
-                                val result = snackbarHostState.showSnackbar(
-                                    message = "Tabungan '${tabungan.nama}' dihapus",
-                                    actionLabel = "Undo",
-                                    duration = SnackbarDuration.Short
-                                )
-                                if (result == SnackbarResult.ActionPerformed) {
-                                    viewModel.restoreTabungan(tabungan.id)
-                                }
-                            }
-                        }
+                        onClick = { navController.navigate(Screen.FormUbah.withId(tabungan.id)) }
                     )
                 }
             }
@@ -240,74 +209,83 @@ fun ScreenContent(
     }
 }
 
-@Composable
-fun ListItem(tabungan: Tabungan, onClick: () -> Unit, onDelete: () -> Unit) {
-    Box(modifier = Modifier.fillMaxWidth()) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { onClick() }
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Text(
-                text = tabungan.nama,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                fontWeight = FontWeight.Bold
-            )
-            Text(text = "Target: Rp${tabungan.target}")
-            Text(text = "Tipe: ${tabungan.tipe}")
-            Text(text = "Menabung: Rp${tabungan.jumlah}")
-        }
+fun formatCurrency(amount: Double): String {
+    val formatter = NumberFormat.getNumberInstance(Locale("id", "ID"))
+    return formatter.format(amount)
+}
 
-        IconButton(
-            onClick = onDelete,
-            modifier = Modifier.align(Alignment.CenterEnd)
-        ) {
-            Icon(
-                imageVector = Icons.Default.Delete,
-                contentDescription = "Hapus",
-                tint = MaterialTheme.colorScheme.error
+@Composable
+fun ListItem(tabungan: Tabungan, onClick: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() }
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Text(
+            text = tabungan.nama,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            fontWeight = FontWeight.Bold
+        )
+        Text(text = "Target: Rp${formatCurrency(tabungan.target)}")
+        Text(text = "Tipe: ${tabungan.tipe}")
+        Text(text = "Menabung: Rp${formatCurrency(tabungan.jumlah)}")
+
+        val remaining = tabungan.target - tabungan.jumlah
+        if (remaining > 0) {
+            Text(
+                text = "Butuh Rp${formatCurrency(remaining)} lagi",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.primary
+            )
+        } else {
+            Text(
+                text = "Target tercapai!",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.tertiary
             )
         }
     }
 }
 
 @Composable
-fun GridItem(tabungan: Tabungan, onClick: () -> Unit, onDelete: () -> Unit) {
+fun GridItem(tabungan: Tabungan, onClick: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         border = BorderStroke(1.dp, DividerDefaults.color)
     ) {
-        Box(modifier = Modifier.fillMaxWidth()) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { onClick() }
-                    .padding(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Text(
-                    text = tabungan.nama,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(text = "Target: Rp${tabungan.target}")
-                Text(text = "Tipe: ${tabungan.tipe}")
-                Text(text = "Menabung: Rp${tabungan.jumlah}")
-            }
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { onClick() }
+                .padding(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text(
+                text = tabungan.nama,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                fontWeight = FontWeight.Bold
+            )
+            Text(text = "Target: Rp${formatCurrency(tabungan.target)}")
+            Text(text = "Tipe: ${tabungan.tipe}")
+            Text(text = "Menabung: Rp${formatCurrency(tabungan.jumlah)}")
 
-            IconButton(
-                onClick = onDelete,
-                modifier = Modifier.align(Alignment.TopEnd)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = "Hapus",
-                    tint = MaterialTheme.colorScheme.error
+            val remaining = tabungan.target - tabungan.jumlah
+            if (remaining > 0) {
+                Text(
+                    text = "Butuh Rp${formatCurrency(remaining)} lagi",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            } else {
+                Text(
+                    text = "Target tercapai!",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.tertiary
                 )
             }
         }

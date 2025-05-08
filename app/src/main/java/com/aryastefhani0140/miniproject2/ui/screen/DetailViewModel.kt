@@ -58,9 +58,5 @@ class DetailViewModel(private val dao: TabunganDao) : ViewModel() {
         }
     }
 
-    fun restoreTabungan(id: Long) {
-        viewModelScope.launch(Dispatchers.IO) {
-            dao.restoreById(id)
-        }
+
     }
-}
