@@ -30,6 +30,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -45,19 +46,16 @@ import androidx.navigation.compose.rememberNavController
 import com.aryastefhani0140.miniproject2.R
 import com.aryastefhani0140.miniproject2.ui.theme.Miniproject2Theme
 import com.aryastefhani0140.miniproject2.util.ViewModelFactory
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 const val KEY_ID_TABUNGAN = "idTabungan"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DetailScreen(navController: NavController, id: Long? = null) {
+fun DetailScreen(navController: NavController, id: Long? = null, onDeleteWithUndo: ((Long, String) -> Unit)? = null) {
     val context = LocalContext.current
     val factory = ViewModelFactory(context)
     val viewModel: DetailViewModel = viewModel(factory = factory)
+    val scope = rememberCoroutineScope()
 
     var nama by remember { mutableStateOf("") }
     var target by remember { mutableStateOf("") }
@@ -131,9 +129,11 @@ fun DetailScreen(navController: NavController, id: Long? = null) {
                         )
                     }
                     if (id != null) {
-                        DeleteAction {
-                            showDialog = true
-                        }
+                        DeleteAction(
+                            delete = {
+                                showDialog = true
+                            }
+                        )
                     }
                 }
             )
@@ -160,12 +160,16 @@ fun DetailScreen(navController: NavController, id: Long? = null) {
             onDismissRequest = { showDialog = false }
         ) {
             showDialog = false
-            viewModel.delete(id)
-            navController.popBackStack()
-            CoroutineScope(Dispatchers.Main).launch {
-                delay(3000)
+            if (onDeleteWithUndo != null) {
+                // Use the callback to handle deletion with undo in MainScreen
+                onDeleteWithUndo(id, nama)
+                navController.popBackStack()
+            } else {
+                // Fallback to normal deletion without undo
+                viewModel.delete(id)
+                navController.popBackStack()
             }
-            }
+        }
     }
 }
 

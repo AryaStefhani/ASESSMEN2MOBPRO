@@ -1,6 +1,5 @@
 package com.aryastefhani0140.miniproject2.ui.screen
 
-import android.content.res.Configuration
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -69,11 +68,11 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(navController: NavHostController) {
+fun MainScreen(navController: NavHostController, viewModel: MainViewModel) {
     val context = LocalContext.current
     val dataStore = SettingsDataStore(context)
     val showList by dataStore.layoutFlow.collectAsState(true)
-    val snackbarHostState = remember { SnackbarHostState() }
+    val snackbarHostState = viewModel.snackbarHostState.collectAsState().value
     var showMenu by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -155,7 +154,8 @@ fun MainScreen(navController: NavHostController) {
             showList = showList,
             modifier = Modifier.padding(innerPadding),
             navController = navController,
-            snackbarHostState = snackbarHostState
+            snackbarHostState = snackbarHostState,
+            viewModel = viewModel
         )
     }
 }
@@ -165,11 +165,9 @@ fun ScreenContent(
     showList: Boolean,
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    snackbarHostState: SnackbarHostState
+    snackbarHostState: SnackbarHostState,
+    viewModel: MainViewModel
 ) {
-    val context = LocalContext.current
-    val factory = ViewModelFactory(context)
-    val viewModel: MainViewModel = viewModel(factory = factory)
     val data by viewModel.data.collectAsState()
     val scope = rememberCoroutineScope()
 
@@ -317,10 +315,11 @@ fun GridItem(tabungan: Tabungan, onClick: () -> Unit, onDelete: () -> Unit) {
 }
 
 @Preview(showBackground = true)
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
 @Composable
 fun MainScreenPreview() {
+    val context = LocalContext.current
+    val dummyViewModel: MainViewModel = viewModel(factory = ViewModelFactory(context))
     Miniproject2Theme {
-        MainScreen(rememberNavController())
+        MainScreen(rememberNavController(), dummyViewModel)
     }
 }
