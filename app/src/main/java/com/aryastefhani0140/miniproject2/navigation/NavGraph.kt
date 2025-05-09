@@ -26,7 +26,6 @@ fun SetupNavGraph(navController: NavHostController = rememberNavController()) {
     val mainViewModel: MainViewModel = viewModel(factory = factory)
     val scope = rememberCoroutineScope()
 
-    // Function to handle deletion with undo
     val deleteWithUndo: (Long, String) -> Unit = { id, name ->
         mainViewModel.deleteTabungan(id)
         scope.launch {

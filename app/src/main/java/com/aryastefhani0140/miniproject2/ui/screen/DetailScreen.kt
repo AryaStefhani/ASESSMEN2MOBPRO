@@ -160,11 +160,11 @@ fun DetailScreen(navController: NavController, id: Long? = null, onDeleteWithUnd
         ) {
             showDialog = false
             if (onDeleteWithUndo != null) {
-                // Use the callback to handle deletion with undo in MainScreen
+
                 onDeleteWithUndo(id, nama)
                 navController.popBackStack()
             } else {
-                // Fallback to normal deletion without undo
+
                 viewModel.delete(id)
                 navController.popBackStack()
             }
@@ -195,6 +195,7 @@ fun DeleteAction(delete: () -> Unit) {
                     delete()
                 }
             )
+
         }
     }
 }
